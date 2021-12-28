@@ -20,7 +20,7 @@ for i in range(9999999999): # this number doesnt have to be any higher than 250 
 
     colums = soup.find_all("tr")
 
-    if len(colums) == 1: # break if it reaches the last page
+    if len(colums) == 1:
         break
 
     for element in range(len(colums)):
