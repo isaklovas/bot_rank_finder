@@ -9,7 +9,7 @@ BOT_FOUND = False
 http = urllib3.PoolManager()
 print("Started searching, this might take a while.....")
 
-for i in range(9999999999): # this number doesnt have to be any higher than 250 lol
+for i in range(999): # this number doesnt have to be any higher than 250 lol
     if i == 0:
         continue
 
