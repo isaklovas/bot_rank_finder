@@ -1,57 +1,46 @@
 from bs4 import BeautifulSoup
-import urllib3
+import requests
 import sys
 
-BASE_PAGE = "https://botrank.pastimes.eu/?sort=rank&page=" 
-BASE_BOT_NAME =  sys.argv[1]
-BOT_FOUND = False
 
-http = urllib3.PoolManager()
-print("Started searching, this might take a while.....")
+def main():
+    BASE_PAGE = "https://botrank.pastimes.eu/?sort=rank&page=" 
 
-for i in range(999): # this number doesnt have to be any higher than 250 lol
-    if i == 0:
-        continue
+    if len(sys.argv) < 2:
+        base_bot_name = input("Enter a reddit username: ")
+    else:
+        base_bot_name = sys.argv[1]
 
-    REQUEST_PAGE = BASE_PAGE + str(i)
-    r = http.request("GET", REQUEST_PAGE)
+    print("Started searching, this might take a while...")
+    for i in range(1, 999999999999): # this number doesnt have to be any higher than 250 lol
+        request_page = BASE_PAGE + str(i)
+        r = requests.get(request_page)
 
-    soup = BeautifulSoup(r.data, "html.parser")
+        soup = BeautifulSoup(r.text, "html.parser")
 
-    colums = soup.find_all("tr")
+        colums = soup.find_all("tr")
 
-    if len(colums) == 1:
-        break
-
-    for element in range(len(colums)):
-        
-        PAGE_BOT_NAME = colums[element].a.get_text()
-
-        if PAGE_BOT_NAME == "Rank":
-            continue
-
-        if PAGE_BOT_NAME == BASE_BOT_NAME:
-            PAGE_BOT_RANK = colums[element].find_all("td")[0].get_text()
-            PAGE_BOT_SCORE = colums[element].find_all("td")[2].get_text()
-            PAGE_BOT_GOOD_VOTES = colums[element].find_all("td")[3].get_text()
-            PAGE_BOT_BAD_VOTES = colums[element].find_all("td")[4].get_text()
-            PAGE_BOT_COMMENT_KARMA = colums[element].find_all("td")[5].get_text()
-            PAGE_BOT_LINK_KARMA = colums[element].find_all("td")[6].get_text()
-            
-            BOT_FOUND = True
+        if len(colums) == 1:
             break
 
-    if BOT_FOUND:
-        break
+        for element in range(len(colums)):
+            PAGE_BOT_NAME = colums[element].a.get_text()
 
-if BOT_FOUND:
-    print(f"\n\nFound bot {BASE_BOT_NAME} on page: \"{REQUEST_PAGE}\", here are the user/bot stats:")
-    print(f"Bot Name: {PAGE_BOT_NAME}")
-    print(f"Score: {PAGE_BOT_SCORE}")
-    print(f"Good Bot Votes: {PAGE_BOT_GOOD_VOTES}")
-    print(f"Bad Bot Votes: {PAGE_BOT_BAD_VOTES}")
-    print(f"Comment Karma: {PAGE_BOT_COMMENT_KARMA} (this value might not be accurate)")
-    print(f"Link Karma: {PAGE_BOT_LINK_KARMA} (this value migth not be accurate)")
+            if PAGE_BOT_NAME == "Rank":
+                continue
 
-else:
-    print(f"Could not find user/bot: {BASE_BOT_NAME}")
+            if PAGE_BOT_NAME == base_bot_name:
+                print(f"\nFound bot {base_bot_name} on page: \"{request_page}\", here are the user/bot stats:")
+                print(f"Bot Name: {PAGE_BOT_NAME}")
+                print(f"Bot Rank: {colums[element].find_all('td')[0].get_text().replace(',', '')}")
+                print(f"Score: {colums[element].find_all('td')[2].get_text()}")
+                print(f"Good Bot Votes: {colums[element].find_all('td')[3].get_text().replace(',', '')}")
+                print(f"Bad Bot Votes: {colums[element].find_all('td')[4].get_text().replace(',', '')}")
+                print(f"Comment Karma: {colums[element].find_all('td')[5].get_text().replace(',', '')}")
+                print(f"Link Karma: {colums[element].find_all('td')[6].get_text().replace(',' , '')}")
+                sys.exit()
+    print(f"Could not find user/bot: {base_bot_name}")
+
+
+if __name__ == "__main__":
+    main()
